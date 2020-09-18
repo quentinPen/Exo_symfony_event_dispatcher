@@ -1,0 +1,49 @@
+services:
+  # Permet d'ajouter des propriétés au services suivant sa classe
+  _instanceof: 
+    Symfony\Component\EventDispatcher\EventSubscriberInterface:
+      tags: ['app.event_subscriber']
+
+  _defaults:
+    autowire: true
+
+  App\:
+    resource: '../src/*'
+    # autowire: true
+
+  App\Controller\OrderController:
+    public: true
+    # autowire: true
+
+  App\Listener\OrderListenerSms:
+    tags: [
+      { name: 'app.event_listener', event: order.after_insert, method: sendSmsToStock, priority: 100 },
+      { name: 'app.event_listener', event: order.after_insert, method: sendSmsToCustomer, priority: 2 }
+      ]
+  #   public: true
+  #   autowire: true
+
+  # Il n'est plus nécessaire de déclarer son tag ici!
+  # App\Listener\OrderEmailsSubscriber:
+  #   tags: ['app.event_subscriber']
+  #   public: true
+  #   autowire: true
+
+
+  
+  Symfony\Component\EventDispatcher\EventDispatcher: ~
+    # public: true
+    # calls:
+    #   - method: 'addListener'
+    #     arguments:
+    #       - order.after_insert
+    #       - ['@App\Listener\OrderListenerSms', 'sendSmsToCustomer']
+    #       - 3
+    #   - method: 'addListener'
+    #     arguments:
+    #       - order.after_insert
+    #       - ['@App\Listener\OrderListenerSms', 'sendSmsToStock']
+    #       - 100
+    #   - method: 'addSubscriber'
+    #     arguments:
+    #       - '@App\Listener\OrderEmailsSubscriber'
